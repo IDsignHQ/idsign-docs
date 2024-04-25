@@ -1,0 +1,19 @@
+{
+  "index": "Quick Start",
+  "whitepaper": "Whitepaper v.0.1.0",
+  "tokenomics": "Tokenomics Draft",
+  "modules": "Protocol & Modules",
+  "more": "More",
+  "landing": {
+    "title": "Home ↗",
+    "type": "page",
+    "href": "https://idsign.com",
+    "newWindow": true
+  },
+  "app": {
+    "title": "App ↗",
+    "type": "page",
+    "href": "https://app.idsign.com/",
+    "newWindow": true
+  }
+}
