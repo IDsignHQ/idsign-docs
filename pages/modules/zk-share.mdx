@@ -22,7 +22,7 @@ ZK-MPC encrypted secret sharing module enabling the most private decentralized f
 
 - User1 wants to share data `D` with User2 and User3 `ACLs`
 - On Frontend, Generate a unique hash `D-H` from the data we want to encrypt and a hash `ACL-H` from the ACLs
-- Call `ZKshare.set(D-H, ACL-H)`  this function will:
+- Call `ZKshare.set(D-H+ACL-H)`  this function will:
     1. Do a Blockchain call: This will create a new multi-party wallet bound only to this new share and have role-based signatures authorizing only User1, User2 and User3 to request signatures. Unlike multi-sig wallet, this multi-party wallet allows one user to generate signatures based on if he is included in the `ACLs`  and also based on if they satisfy the rules defined in the ACLs (such as being a DAO member, or holds an NFT, or just have a valid signature)
     2. Blockchain Response: This new share-bound wallet will request the MPC nodes to generate a TSS signature `S`. Each node will return part of the signature to the frontend
     3. The frontend combines the signature parts into one signature and encrypts `D` with that signature. (The signature will be the encryption/decryption key)
@@ -38,6 +38,112 @@ ZK-MPC encrypted secret sharing module enabling the most private decentralized f
 - User2 can combine the signature parts and decrypt `encryptedData` to get the original data `D`
 
 The programmable MPC wallet should have 1/n of a signature extracting the public key and checking it to the ACLs and then hash the ACLs to compare with ACL-H
+
+**Example Implementation:**
+
+```rust
+// This is a sample and should not be used in production!!
+// TODO:
+//  - The function split_aes_key should contain real cryptographic splitting logic.
+//  - sign_vault_id must utilize cryptographic methods to sign the vault's ID securely.
+//  - Authentication mechanisms and SIWE integration must be implemented according to Ethereum standards.
+//  - Salt retrieval and session management should be securely handled to prevent MITM attacks and replay attacks.
+//  - The frontend will need to interact with these functions using a web3 interface, sending public/private keys and session management securely.
+extern crate pbc_contract_codegen;
+extern crate pbc_contract_common;
+
+use pbc_contract_common::context::ContractContext;
+use pbc_contract_common::zk::{ZkInputDef, ZkState};
+use pbc_contract_common::crypto::secp256k1::Secp256k1;
+use pbc_contract_common::crypto::aes::{Aes256, NewCipher, generic_array::GenericArray};
+use std::collections::HashMap;
+use pbc_zk::{Sbi64, PublicKey, SecretBinary};
+use serde::{Serialize, Deserialize};
+
+/// Structure for storing encrypted secrets and the list of authorized addresses
+#[derive(Serialize, Deserialize)]
+pub struct Vault {
+    owner: PublicKey,
+    secret_part_1: Sbi64,
+    secret_part_2: Sbi64,
+    secret_part_3: Sbi64,
+    members: Vec<PublicKey>,
+}
+
+#[state]
+struct ContractState {
+    vaults: HashMap<u32, Vault>,
+}
+
+/// Initialize the contract state
+#[init]
+fn initialize(ctx: ContractContext) -> ContractState {
+    ContractState {
+      vaults: HashMap::new(),
+    }
+}
+
+#[zk_on_secret_input]
+pub fn set(unique_id: i32, members: Vec<PublicKey>) -> String {
+    // Simulate splitting AES key into three parts
+    let aes_key_parts = split_aes_key(); 
+    let vault = Vault {
+        owner: get_public_key(), // Assuming function to fetch owner's public key
+        secret_part_1: aes_key_parts.0,
+        secret_part_2: aes_key_parts.1,
+        secret_part_3: aes_key_parts.2,
+        members,
+    };
+
+    // Simulate signing the vault ID with the private secret
+    let signature = sign_vault_id(unique_id, &vault);
+    signature
+}
+
+#[zk_on_compute_complete]
+pub fn get(vault_id: i32, siwe_signature: String) -> Result<Sbi64, &'static str> {
+    let address = verify_siwe_signature(siwe_signature)?;
+    let salt = request_salt_from_server(address)?;
+
+    let vault = load_vault(vault_id);
+    if vault.members.contains(&address) {
+        let combined_aes_key = combine_secret_parts(vault.secret_part_1, vault.secret_part_2, vault.secret_part_3);
+        Ok(combined_aes_key)
+    } else {
+        Err("Access Denied")
+    }
+}
+
+fn split_aes_key() -> (Sbi64, Sbi64, Sbi64) {
+    // Placeholder: logic to split AES key into three parts
+    (Sbi64::from(123), Sbi64::from(456), Sbi64::from(789))
+}
+
+fn sign_vault_id(vault_id: i32, vault: &Vault) -> String {
+    // Placeholder: logic to generate a signature
+    "signature_placeholder".to_string()
+}
+
+fn verify_siwe_signature(signature: String) -> Result<PublicKey, &'static str> {
+    // Placeholder: logic to verify SIWE signature
+    Ok(PublicKey::new())
+}
+
+fn request_salt_from_server(wallet_address: PublicKey) -> Result<i64, &'static str> {
+    // Placeholder: logic to request salt
+    Ok(123456)
+}
+
+fn combine_secret_parts(part1: Sbi64, part2: Sbi64, part3: Sbi64) -> Sbi64 {
+    part1 + part2 + part3 // Simplified, should be SSS
+}
+
+fn load_vault(vault_id: i32) -> Vault {
+    // Placeholder: logic to load vault
+    return state.vaults[vault_id]
+}
+
+```
 
 **Example Usage:**
 
