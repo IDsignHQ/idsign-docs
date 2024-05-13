@@ -2,17 +2,22 @@
 ZK-MPC encrypted secret sharing module enabling the most private decentralized file sharing with no one in the middle, not event idSign; ONLY the wallets added to document can ever reconstruct and decrypt the documents shared via IPFS
 
 ---
-### TL;DR
-Imagine you want to send a secret message or file to someone or to a group of members such as a DAO. With zkShare, you can encrypt the data on the frontend with a unique generated key and this key gets stored on 3 nodes on an MPC blockchain (partisiablockchain.com) or any Advanced MPC blockchain. The other members can then request the secret key, and decrypt the data that was stored publically but encrypted.
----
-**Objective**: Securely share a secret among a predefined set of users/wallets, authorized via their wallet addresses, using zero-knowledge proofs to maintain privacy.
 
-**Components**:
+### TL;DR
+
+Imagine you want to send a secret message or file to someone or to a group of members such as a DAO. With zkShare, you can encrypt the data on the frontend with a unique generated key and this key gets stored on 3 nodes on an MPC blockchain (partisiablockchain.com) or any Advanced MPC blockchain. The other members can then request the secret key, and decrypt the data that was stored publically but encrypted.
+
+---
+
+### **Objective**: 
+Securely share a secret among a predefined set of users/wallets, authorized via their wallet addresses, using zero-knowledge proofs to maintain privacy.
+
+### **Components**:
 
 - **Smart Contract or Decentralized Storage:** For Storing The resourceID, encryptedSecret, and its ACLs (Access Control Lists). These values can be stored publicly leveraging the “no single point of failure” nature of this technology but at the same time ensuring privacy of the stored secret limiting it to a set of authorized users
 - **zkShare module:** For generating a new share, granting access of a share and modifying ACLs of an existing share. This should be implemented through programmable MPC actions leveraging computational rules done by multiple on-chain nodes (zkSmartContract)
 
-**Use Cases:**
+### **Use Cases:**
 
 - End-to-end Encrypted on-chain messaging
 - Decentralized file-sharing (sharing the decryption key of an encrypted file stored on IPFS)
@@ -20,7 +25,7 @@ Imagine you want to send a secret message or file to someone or to a group of me
 - Token-Gating without relying on a server to “Gate” the resource or the key to the resource
 - Many more…
 
-**Implementation Flow:**
+### **Implementation Flow:**
 
 - User1 wants to share data `D` with User2 and User3 `ACLs`
 - On Frontend, Generate a unique hash `D-H` from the data we want to encrypt and a hash `ACL-H` from the ACLs
@@ -41,7 +46,7 @@ Imagine you want to send a secret message or file to someone or to a group of me
 
 The programmable MPC wallet should have 1/n of a signature extracting the public key and checking it to the ACLs and then hash the ACLs to compare with ACL-H
 
-**Example Implementation:**
+### **Example Implementation:**
 
 ```rust
 // This is a sample and should not be used in production!!
@@ -171,7 +176,7 @@ fn combine_secret_parts(part1: Sbi64, part2: Sbi64, part3: Sbi64) -> Sbi64 {
 
 ```
 
-**Example Usage:**
+### **Example Usage:**
 
 > [idSign.com](http://idSign.com) is a decentralized eSignature protocol that allows users to sign agreements(pdfs) on-chain and get a SoulBound NFT (proof-of-signature). Anyone can verify that the parties signed an agreement but ONLY the parties can access the pdf agreement shared for signature. No one in the middle, mot even idSign, can ever decrypt the document. The parties can choose the add/remove mediators or lawyers to their agreement 
 
