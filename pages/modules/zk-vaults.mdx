@@ -1,0 +1,49 @@
+# zkVaults Module (DKMS)
+ZK-MPC encrypted secret sharing module enabling the most private decentralized file sharing with no one in the middle, not event idSign; ONLY the wallets added to document can ever reconstruct and decrypt the documents shared via IPFS
+
+---
+
+### TL;DR
+
+Imagine you want to send a secret message or file to someone or to a group of members such as a DAO. With zkVaults, you can encrypt the data on the frontend with a unique generated key and this key gets stored on 3 nodes on an MPC blockchain (partisiablockchain.com) or any Advanced MPC blockchain. The other members can then request the secret key, and decrypt the data that was stored publically but encrypted.
+
+---
+
+### **Objective**: 
+Securely share a secret among a predefined set of users/wallets, authorized via their wallet addresses, using zero-knowledge proofs to maintain privacy.
+
+### **Components**:
+
+- **Smart Contract or Decentralized Storage:** For Storing The resourceID, encryptedSecret, and its ACLs (Access Control Lists). These values can be stored publicly leveraging the “no single point of failure” nature of this technology but at the same time ensuring privacy of the stored secret limiting it to a set of authorized users
+- **zkVaults module:** For generating a new share, granting access of a share and modifying ACLs of an existing share. This should be implemented through programmable MPC actions leveraging computational rules done by multiple on-chain nodes (zkSmartContract)
+
+### **Use Cases:**
+
+- End-to-end Encrypted on-chain messaging
+- Decentralized file-sharing (sharing the decryption key of an encrypted file stored on IPFS)
+- Sharing information privately between DAO members
+- Token-Gating without relying on a server to “Gate” the resource or the key to the resource
+- Many more…
+
+### **Implementation Flow:**
+
+- User1 wants to share data `D` with User2 and User3 `ACLs`
+- On Frontend, Generate a unique hash `D-H` from the data we want to encrypt and a hash `ACL-H` from the ACLs
+- Call `zkVaults.set(D-H+ACL-H)`  this function will:
+    1. Do a Blockchain call: This will create a new multi-party wallet bound only to this new share and have role-based signatures authorizing only User1, User2 and User3 to request signatures. Unlike multi-sig wallet, this multi-party wallet allows one user to generate signatures based on if he is included in the `ACLs`  and also based on if they satisfy the rules defined in the ACLs (such as being a DAO member, or holds an NFT, or just have a valid signature)
+    2. Blockchain Response: This new share-bound wallet will request the MPC nodes to generate a TSS signature `S`. Each node will return part of the signature to the frontend
+    3. The frontend combines the signature parts into one signature and encrypts `D` with that signature. (The signature will be the encryption/decryption key)
+    4. Finally the function will return `encryptedData`
+- User1 now can safely store `ACLs, encryptedData and D-H` publicly on a smart contract or IPFS or database
+
+- User2 now wants to access the file. They are logged in with any EOA
+- User2 queries the API or smart contract that returns the `ACLs, encryptedData and D-H` of the resources he is part of.
+- User2 calls `zkVaults.get(D-H, ACLs, personal_sign)` this function will:
+    - request a TSS signature from the same share-bound wallet created by user1
+    - Before creating the signature, the blockchain node must verify that this user is in the ACLs and satisfies the rules set by these ACLs
+    - If this is true, then the MPC nodes creates the same signature and sends back the parts to user2
+- User2 can combine the signature parts and decrypt `encryptedData` to get the original data `D`
+
+The programmable MPC wallet should have 1/n of a signature extracting the public key and checking it to the ACLs and then hash the ACLs to compare with ACL-H
+
+View on Github: https://github.com/idsignhq/idsign-zk-vaults
