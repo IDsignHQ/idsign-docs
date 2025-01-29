@@ -1,5 +1,8 @@
 {
   "proof-of-signature": "Proof of Signature",
-  "reusable-identity": "Reusable Identity",
-  "zk-vaults": "MPC zkVaults Layer 3"
+  "reusable-identity": "Reusable DID",
+  "escrow": "On-chain Escrow",
+  "mpc-vaults": "MPCvaults",
+  "ai-agent": "AI Legal Agent",
+  "mediation-network": "Human-Nodes Mediation Network (L2)"
 }
