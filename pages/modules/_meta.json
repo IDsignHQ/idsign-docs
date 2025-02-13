@@ -3,6 +3,5 @@
   "reusable-identity": "Reusable DID",
   "escrow": "On-chain Escrow",
   "mpc-vaults": "MPCvaults",
-  "ai-agent": "AI Legal Agent",
-  "mediation-network": "Human-Nodes Mediation Network (L2)"
+  "mediation-network": "Mediation Network (L2)"
 }
