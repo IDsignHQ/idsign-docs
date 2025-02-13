@@ -1,8 +1,9 @@
 {
   "index": "Quick Start",
   "whitepaper": "Whitepaper v.0.1.0",
-  "tokenomics": "Tokenomics Draft",
   "modules": "Protocol & Modules",
+  "developer": "Developer Docs",
+  "tokenomics": "Tokenomics",
   "landing": {
     "title": "Home ↗",
     "type": "page",
